@@ -4,25 +4,31 @@ MAINTAINER Peter Mount <peter@retep.org>
 
 # Update apt. Unlike most builds we will keep this in place
 # Force timezone as this hangs builds waiting for a response
-RUN echo "Europe/London" > /etc/timezone &&\
-    dpkg-reconfigure -f noninteractive tzdata &&\
+# See https://stackoverflow.com/a/47909037
+RUN echo "tzdata tzdata/Areas select Europe" > /tmp/preseed.txt; \
+    echo "tzdata tzdata/Zones/Europe select London" >> /tmp/preseed.txt; \
+    debconf-set-selections /tmp/preseed.txt && \
+    rm /etc/timezone && \
+    rm /etc/localtime && \
     apt-get update &&\
     apt-get install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        libcurl4-openssl-dev \
-        s3cmd \
-        sudo \
-        unzip \
-        vim \
-        zip \
-        aufs-tools \
-        autoconf \
-        automake \
-        build-essential \
-        cvs \
-        git \
-        mercurial \
-        reprepro \
-        subversion
+      tzdata \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      libcurl4-openssl-dev \
+      s3cmd \
+      sudo \
+      unzip \
+      vim \
+      zip \
+      aufs-tools \
+      autoconf \
+      automake \
+      build-essential \
+      cvs \
+      git \
+      mercurial \
+      reprepro \
+      subversion &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
