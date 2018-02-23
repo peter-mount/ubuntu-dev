@@ -38,8 +38,5 @@ RUN echo "tzdata tzdata/Areas select Europe" > /tmp/preseed.txt; \
       gcc \
       g++ \
       python \
-      linux-headers \
-      paxctl \
-      libgcc \
-      libstdc++ &&\
+      paxctl &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
