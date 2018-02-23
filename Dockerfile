@@ -33,5 +33,13 @@ RUN echo "tzdata tzdata/Areas select Europe" > /tmp/preseed.txt; \
       git \
       mercurial \
       reprepro \
-      subversion &&\
+      subversion \
+      make \
+      gcc \
+      g++ \
+      python \
+      linux-headers \
+      paxctl \
+      libgcc \
+      libstdc++ &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
