@@ -23,4 +23,3 @@ RUN apt-get update &&\
         mercurial \
         reprepro \
         subversion
-        mkdir -p /opt
