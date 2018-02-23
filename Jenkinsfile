@@ -85,7 +85,7 @@ architectures.each {
 
 node( "AMD64" ) {
    ubuntuVersions.each {
-     ubuntuVersion ->  stage( "Publish MultiArch" + ' deb'+ ubuntuVersion ) {
+     ubuntuVersion ->  stage( "Publish MultiArch" + ' '+ ubuntuVersion ) {
       // The manifest to publish
       multiImage = dockerImage( '',  ubuntuVersion )
 
