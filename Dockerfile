@@ -2,6 +2,10 @@ ARG ubuntuVersion=18.04
 FROM ubuntu:${ubuntuVersion}
 MAINTAINER Peter Mount <peter@retep.org>
 
+## for apt to be noninteractive
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN true
+
 # Update apt. Unlike most builds we will keep this in place
 # Force timezone as this hangs builds waiting for a response
 # See https://stackoverflow.com/a/47909037
