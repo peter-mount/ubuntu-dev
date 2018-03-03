@@ -62,14 +62,12 @@ properties( [
   ])
 ])
 
-architectures.each {
-  architecture -> node( slaveId( architecture ) ) {
-    stage( "Checkout " + architecture ) {
-      checkout scm
-    }
+def buildArch = {
+  architecture, ubuntuVersion ->
+    node( slaveId( architecture ) ) {
+      stage( ubuntuVersion ) {
+        checkout scm
 
-     ubuntuVersions.each {
-       ubuntuVersion -> stage( ' ubuntu-' +  ubuntuVersion + ' ' + architecture ) {
         sh 'docker pull  ubuntu:' +  ubuntuVersion
 
         sh 'docker build' +
@@ -80,30 +78,42 @@ architectures.each {
         sh 'docker push ' + dockerImage( architecture,  ubuntuVersion )
       }
     }
-  }
+
 }
 
 node( "AMD64" ) {
-   ubuntuVersions.each {
-     ubuntuVersion ->  stage( "Publish MultiArch" + ' '+ ubuntuVersion ) {
-      // The manifest to publish
-      multiImage = dockerImage( '',  ubuntuVersion )
-
-      // Create/amend the manifest with our architectures
-      manifests = architectures.collect { architecture -> dockerImage( architecture,  ubuntuVersion ) }
-      sh 'docker manifest create -a ' + multiImage + ' ' + manifests.join(' ')
-
-      // For each architecture annotate them to be correct
-      architectures.each {
-        architecture -> sh 'docker manifest annotate' +
-          ' --os linux' +
-          ' --arch ' + goarch( architecture ) +
-          ' ' + multiImage +
-          ' ' + dockerImage( architecture,  ubuntuVersion )
+  ubuntuVersions.each {
+    ubuntuVersion ->
+      stage( ubuntuVersion ) {
+        parallel(
+          'amd64': {
+            buildArch( 'amd64', ubuntuVersion )
+          }
+          'arm64v8': {
+            buildArch( 'arm64v8', ubuntuVersion )
+          }
+        )
       }
 
-      // Publish the manifest
-      sh 'docker manifest push -p ' + multiImage
+      stage( "MultiArch" + ' '+ ubuntuVersion ) {
+        // The manifest to publish
+        multiImage = dockerImage( '',  ubuntuVersion )
+
+        // Create/amend the manifest with our architectures
+        manifests = architectures.collect { architecture -> dockerImage( architecture,  ubuntuVersion ) }
+        sh 'docker manifest create -a ' + multiImage + ' ' + manifests.join(' ')
+
+        // For each architecture annotate them to be correct
+        architectures.each {
+          architecture -> sh 'docker manifest annotate' +
+            ' --os linux' +
+            ' --arch ' + goarch( architecture ) +
+            ' ' + multiImage +
+            ' ' + dockerImage( architecture,  ubuntuVersion )
+        }
+
+        // Publish the manifest
+        sh 'docker manifest push -p ' + multiImage
+      }
     }
-  }
 }
