@@ -88,7 +88,7 @@ node( "AMD64" ) {
         parallel(
           'amd64': {
             buildArch( 'amd64', ubuntuVersion )
-          }
+          },
           'arm64v8': {
             buildArch( 'arm64v8', ubuntuVersion )
           }
