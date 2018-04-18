@@ -58,7 +58,7 @@ properties( [
   disableConcurrentBuilds(),
   disableResume(),
   pipelineTriggers([
-    upstream('/Public/Alpine/master'),
+    upstream('/peter-mount/alpine/master'),
   ])
 ])
 
